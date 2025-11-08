@@ -19,7 +19,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.atosin  056.LoidAI"
+      "package": "com.atosin056.LoidAI"
     },
     "web": {
       "output": "static",
