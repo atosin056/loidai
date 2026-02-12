@@ -4,10 +4,6 @@ import {
   Montserrat_600SemiBold,
   Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
-import * as NavigationBar from "expo-navigation-bar";
-import { useEffect } from "react";
-import { StatusBar } from "react-native";
-
 import {
   Poppins_400Regular,
   Poppins_500Medium,
@@ -16,13 +12,19 @@ import {
 } from "@expo-google-fonts/poppins";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useFonts } from "expo-font";
+import * as NavigationBar from "expo-navigation-bar";
+import { useEffect } from "react";
+import { StatusBar } from "react-native";
 import Chat from "./Chat";
 import Dashboard from "./Dashboard";
 import Notifications from "./Notifications";
 import Pulserate from "./Pulserate";
+import Pushmanager from "./Pushmanager";
 import ReadVitals from "./ReadVitals";
+import Runvitals from "./Runvitals";
 import Settings from "./Settings";
 import Signin from "./Signin";
+import { Vitals } from "./Vitals";
 import Walkthrough from "./Walkthrough"; // adjust path if needed
 const Stack = createNativeStackNavigator();
 
@@ -65,6 +67,15 @@ export default function Index() {
 
     hideBars();
   }, []);
+
+  useEffect(() => {
+    Vitals();
+    // Then run every 5 minutes
+    const interval = setInterval(Vitals, 5 * 60 * 1000);
+
+    // Cleanup on unmount
+    return () => clearInterval(interval);
+  }, []);
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
@@ -82,7 +93,7 @@ export default function Index() {
 
   return (
     <Stack.Navigator
-      initialRouteName="Dashboard"
+      initialRouteName="Runvitals"
       screenOptions={{
         headerShown: false,
         animation: "slide_from_right",
@@ -95,6 +106,9 @@ export default function Index() {
       <Stack.Screen name="Signin" component={Signin} />
       <Stack.Screen name="Pulserate" component={Pulserate} />
       <Stack.Screen name="ReadVitals" component={ReadVitals} />
+      <Stack.Screen name="Pushmanager" component={Pushmanager} />
+      <Stack.Screen name="Runvitals" component={Runvitals} />
+      <Stack.Screen name="Vitals" component={Vitals} />
       <Stack.Screen name="Notifications" component={Notifications} />
     </Stack.Navigator>
   );
