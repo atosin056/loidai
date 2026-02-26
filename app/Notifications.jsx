@@ -1,8 +1,12 @@
 import { useNavigation } from "@react-navigation/native";
-import { Image, Pressable, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useVitals } from "./VitalsContext";
+
 export default function Notifications() {
   const navigation = useNavigation();
+  const { notifications } = useVitals();
+
   return (
     <SafeAreaView
       style={{
@@ -14,37 +18,87 @@ export default function Notifications() {
         gap: 30,
       }}
     >
-      <View>
-        <Pressable
-          onPress={() => navigation.goBack()}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 10,
-          }}
-        >
-          <Image
-            source={require("../assets/images/left.png")}
-            style={{ width: 28, height: 28 }}
-          ></Image>
-
-          <View>
-            <Text style={{ fontFamily: "Poppins_400Regular", fontSize: 24 }}>
-              Notifications
-            </Text>
-          </View>
-        </Pressable>
+      <ScrollView>
         <View>
-          <View style={{ marginTop: 20 }}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            <Image
+              source={require("../assets/images/left.png")}
+              style={{ width: 28, height: 28 }}
+            ></Image>
             <View>
+              <Text style={{ fontFamily: "Poppins_400Regular", fontSize: 24 }}>
+                Notifications
+              </Text>
+            </View>
+          </Pressable>
+          <View>
+            <View style={{ marginTop: 20 }}>
               <View>
-                <Text
-                  style={{ color: "grey", fontFamily: "Poppins_400Regular" }}
-                >
-                  Today
-                </Text>
-              </View>
-              <View
+                <View>
+                  <Text
+                    style={{ color: "grey", fontFamily: "Poppins_400Regular" }}
+                  >
+                    Today
+                  </Text>
+                </View>
+
+                {/* ── AI-generated notifications injected here ── */}
+                {notifications.map((notif) => (
+                  <View
+                    key={notif.id}
+                    style={{
+                      flexDirection: "row",
+                      gap: 15,
+                      marginTop: 15,
+                      borderBottomColor: "silver",
+                      borderBottomWidth: 1,
+                      paddingBottom: 15,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 64,
+                        height: 64,
+                        backgroundColor: "#E5F2FF",
+                        borderRadius: 8,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ fontSize: 21 }}>{notif.emoji}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          fontFamily: "Poppins_400Regular",
+                        }}
+                      >
+                        {notif.title}
+                      </Text>
+                      <Text
+                        style={{
+                          fontFamily: "Poppins_400Regular",
+                          fontSize: 12,
+                          color: "#999",
+                          paddingRight: 45,
+                        }}
+                      >
+                        {notif.message}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+                {/* ── End AI notifications ── */}
+
+                {/* <View
                 style={{
                   flexDirection: "row",
                   gap: 15,
@@ -86,9 +140,9 @@ export default function Notifications() {
                     </Text>
                   </View>
                 </View>
-              </View>
-              {/* End */}
-              <View
+              </View> */}
+                {/* End */}
+                {/* <View
                 style={{
                   flexDirection: "row",
                   gap: 15,
@@ -130,19 +184,19 @@ export default function Notifications() {
                     </Text>
                   </View>
                 </View>
+              </View> */}
+                {/* End */}
               </View>
               {/* End */}
-            </View>
-            {/* End */}
-            <View style={{ marginTop: 30 }}>
-              <View>
+              <View style={{ marginTop: 30 }}>
+                {/* <View>
                 <Text
                   style={{ color: "grey", fontFamily: "Poppins_400Regular" }}
                 >
                   Yesterday
                 </Text>
-              </View>
-              <View
+              </View> */}
+                {/* <View
                 style={{
                   flexDirection: "row",
                   gap: 15,
@@ -184,9 +238,9 @@ export default function Notifications() {
                     </Text>
                   </View>
                 </View>
-              </View>
-              {/* End */}
-              <View
+              </View> */}
+                {/* End */}
+                {/* <View
                 style={{
                   flexDirection: "row",
                   gap: 15,
@@ -228,13 +282,14 @@ export default function Notifications() {
                     </Text>
                   </View>
                 </View>
+              </View> */}
+                {/* End */}
               </View>
               {/* End */}
             </View>
-            {/* End */}
           </View>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

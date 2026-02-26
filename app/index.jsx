@@ -21,10 +21,9 @@ import Notifications from "./Notifications";
 import Pulserate from "./Pulserate";
 import Pushmanager from "./Pushmanager";
 import ReadVitals from "./ReadVitals";
-import Runvitals from "./Runvitals";
 import Settings from "./Settings";
 import Signin from "./Signin";
-import { Vitals } from "./Vitals";
+import { VitalsProvider } from "./VitalsContext";
 import Walkthrough from "./Walkthrough"; // adjust path if needed
 const Stack = createNativeStackNavigator();
 
@@ -68,14 +67,6 @@ export default function Index() {
     hideBars();
   }, []);
 
-  useEffect(() => {
-    Vitals();
-    // Then run every 5 minutes
-    const interval = setInterval(Vitals, 5 * 60 * 1000);
-
-    // Cleanup on unmount
-    return () => clearInterval(interval);
-  }, []);
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
@@ -92,24 +83,24 @@ export default function Index() {
   }
 
   return (
-    <Stack.Navigator
-      initialRouteName="Runvitals"
-      screenOptions={{
-        headerShown: false,
-        animation: "slide_from_right",
-      }}
-    >
-      <Stack.Screen name="Walkthrough" component={Walkthrough} />
-      <Stack.Screen name="Settings" component={Settings} />
-      <Stack.Screen name="Chat" component={Chat} />
-      <Stack.Screen name="Dashboard" component={Dashboard} />
-      <Stack.Screen name="Signin" component={Signin} />
-      <Stack.Screen name="Pulserate" component={Pulserate} />
-      <Stack.Screen name="ReadVitals" component={ReadVitals} />
-      <Stack.Screen name="Pushmanager" component={Pushmanager} />
-      <Stack.Screen name="Runvitals" component={Runvitals} />
-      <Stack.Screen name="Vitals" component={Vitals} />
-      <Stack.Screen name="Notifications" component={Notifications} />
-    </Stack.Navigator>
+    <VitalsProvider>
+      <Stack.Navigator
+        initialRouteName="Dashboard"
+        screenOptions={{
+          headerShown: false,
+          animation: "slide_from_right",
+        }}
+      >
+        <Stack.Screen name="Walkthrough" component={Walkthrough} />
+        <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen name="Chat" component={Chat} />
+        <Stack.Screen name="Dashboard" component={Dashboard} />
+        <Stack.Screen name="Signin" component={Signin} />
+        <Stack.Screen name="Pulserate" component={Pulserate} />
+        <Stack.Screen name="ReadVitals" component={ReadVitals} />
+        <Stack.Screen name="Pushmanager" component={Pushmanager} />
+        <Stack.Screen name="Notifications" component={Notifications} />
+      </Stack.Navigator>
+    </VitalsProvider>
   );
 }

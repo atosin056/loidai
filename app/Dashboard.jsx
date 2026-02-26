@@ -1,41 +1,49 @@
 import { useNavigation } from "@react-navigation/native";
-import * as NavigationBar from "expo-navigation-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Image,
   ImageBackground,
   Pressable,
   ScrollView,
-  StatusBar,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BottomNav from "./BottomNav";
+import { Vitals } from "./Vitals"; // your function
+import { useVitals } from "./VitalsContext"; // adjust path if needed
 export default function Dashboard() {
+  const { vitalsData, updateVitals } = useVitals();
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const handleRefresh = async () => {
+    setLoading(true);
+    await Vitals(updateVitals);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const hideBars = async () => {
-      try {
-        // hide top status bar
-        StatusBar.setHidden(true, "fade");
+    handleRefresh(); // runs once on mount
 
-        // hide bottom system nav bar
-        await NavigationBar.setVisibilityAsync("hidden");
+    const interval = setInterval(() => {
+      Vitals(updateVitals);
+    }, 300000); // every 1 min (change to 300000 for 5 mins)
 
-        // make it stay hidden even when user swipes
-        await NavigationBar.setBehaviorAsync("overlay-swipe");
-      } catch (e) {
-        console.log("Error hiding bars:", e);
-      }
-    };
-
-    hideBars();
+    return () => clearInterval(interval);
   }, []);
-  function PulseRate() {
-    navigation.navigate("Pulserate");
+
+  if (loading || !vitalsData) {
+    return (
+      <SafeAreaView
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <Text>Loading vitals...</Text>
+      </SafeAreaView>
+    );
   }
+
+  const { snapshot, analysis, shouldNotify } = vitalsData;
   return (
     <SafeAreaView
       style={{
@@ -130,7 +138,7 @@ export default function Dashboard() {
           <View style={{ width: "100%", gap: 10 }}>
             <View style={{ flexDirection: "row", width: "100%", gap: 10 }}>
               <Pressable
-                onPress={PulseRate}
+                onPress={() => navigation.navigate("Pulserate")}
                 style={{
                   backgroundColor: "#E5F2FF",
                   flex: 7,
@@ -181,7 +189,7 @@ export default function Dashboard() {
                           fontSize: 32,
                         }}
                       >
-                        72
+                        {snapshot.heartRate}
                       </Text>
                       <Text
                         style={{ lineHeight: 35, color: "grey", fontSize: 12 }}
@@ -224,7 +232,7 @@ export default function Dashboard() {
                           fontFamily: "Poppins_400Regular",
                         }}
                       >
-                        Sleep Rate
+                        Sleep
                       </Text>
                     </View>
                     <View
@@ -240,10 +248,10 @@ export default function Dashboard() {
                           fontSize: 32,
                         }}
                       >
-                        6.5
+                        {snapshot.sleep}
                       </Text>
                       <Text
-                        style={{ lineHeight: 35, color: "grey", fontSize: 12 }}
+                        style={{ lineHeight: 45, color: "grey", fontSize: 12 }}
                       >
                         Hrs
                       </Text>
@@ -353,7 +361,7 @@ export default function Dashboard() {
                           fontFamily: "Poppins_400Regular",
                         }}
                       >
-                        Blood Pressure
+                        Blood Oxygen
                       </Text>
                     </View>
                     <View
@@ -369,12 +377,12 @@ export default function Dashboard() {
                           fontSize: 32,
                         }}
                       >
-                        120/80
+                        {snapshot.spo2}
                       </Text>
                       <Text
                         style={{ lineHeight: 35, color: "grey", fontSize: 12 }}
                       >
-                        mmHg
+                        %
                       </Text>
                     </View>
                   </View>
