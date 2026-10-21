@@ -3,11 +3,23 @@
 # dependencies
 node_modules/
 
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
 # Expo
 .expo/
 dist/
 web-build/
 expo-env.d.ts
+
+# coverage and caches
+coverage/
+.cache/
+.turbo/
 
 # Native
 .kotlin/
@@ -18,26 +30,44 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+# Android build output and local configuration
+**/android/.gradle/
+**/android/local.properties
+**/android/**/build/
+**/android/.cxx/
+**/android/.externalNativeBuild/
+**/android/captures/
+**/android/*.iml
+
+# iOS build output and local Xcode state
+**/ios/Pods/
+**/ios/build/
+**/ios/DerivedData/
+**/ios/xcuserdata/
+**/ios/*.xcuserstate
+
 # Metro
 .metro-health-check*
-
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
 
 # macOS
 .DS_Store
 *.pem
 
-# local env files
-.env*.local
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Editors
+.idea/
+*.swp
+*.swo
+
+# local environment files (keep example templates)
+.env
+.env.*
+!.env.example
+!.env.*.example
 
 # typescript
 *.tsbuildinfo
 
-app-example
-
-# generated native folders
-/ios
-/android
