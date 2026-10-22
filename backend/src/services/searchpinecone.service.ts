@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { Pinecone } from '@pinecone-database/pinecone';
 import { generateEmbedding } from './embedding.service.js';
-import { GoogleGenAI } from '@google/genai';
+import { geminiFallback } from './fallback.service.js';
 
 // define the necessary variables for the PINECONE API
 const PINECONE_API_KEY = process.env.PINECONE_API_KEY;
@@ -17,8 +17,7 @@ const pinecone = new Pinecone({
 
 const index = pinecone.index({ host: PINECONE_URL });
 
-export const searchPinecone = async (embdeddings: number[]) => {
-    const ai = new GoogleGenAI({});
+export const searchPinecone = async (embdeddings: number[], question: string) => {
     const results = await index.query({
         vector: embdeddings,
         topK: 10,
@@ -39,8 +38,15 @@ export const searchPinecone = async (embdeddings: number[]) => {
     else {
         // Fallback to gemini
         console.log("No suitable match found. Using Gemini as fallback.");
-        
-        return null;
+        const fallbackResponse = await geminiFallback(question);
+        return {
+            id: "gemini-fallback",
+            score: 1.0,
+            metadata: {
+                question: question,
+                answer: fallbackResponse
+            }
+        };
     }
 }
 
