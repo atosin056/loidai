@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { Pinecone } from '@pinecone-database/pinecone';
 import { generateEmbedding } from './embedding.service.js';
+import { GoogleGenAI } from '@google/genai';
 
 // define the necessary variables for the PINECONE API
 const PINECONE_API_KEY = process.env.PINECONE_API_KEY;
@@ -17,6 +18,7 @@ const pinecone = new Pinecone({
 const index = pinecone.index({ host: PINECONE_URL });
 
 export const searchPinecone = async (embdeddings: number[]) => {
+    const ai = new GoogleGenAI({});
     const results = await index.query({
         vector: embdeddings,
         topK: 10,
