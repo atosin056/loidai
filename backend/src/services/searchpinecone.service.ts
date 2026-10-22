@@ -24,7 +24,22 @@ export const searchPinecone = async (embdeddings: number[]) => {
     });
 
     const bestMatch = results.matches[0];
-    return bestMatch;
+    const scoreThreshold: number = 0.85;
+
+    if(!bestMatch?.score) {
+        throw new Error("No matches found in Pinecone.");
+    }
+
+    if (bestMatch && bestMatch?.score >= scoreThreshold) {
+        return bestMatch;
+    }
+
+    else {
+        // Fallback to gemini
+        console.log("No suitable match found. Using Gemini as fallback.");
+        
+        return null;
+    }
 }
 
 
