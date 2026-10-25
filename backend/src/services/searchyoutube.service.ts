@@ -47,6 +47,3 @@ export const searchyoutube = async (query: string) => {
 
     }
 }
-
-const search = await searchyoutube('first aid for cuts');
-console.log(search)
