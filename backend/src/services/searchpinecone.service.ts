@@ -1,9 +1,7 @@
 import 'dotenv/config';
 import { Pinecone } from '@pinecone-database/pinecone';
-import { generateEmbedding } from './embedding.service.js';
 import { geminiFallback } from './fallback.service.js';
 
-// define the necessary variables for the PINECONE API
 const PINECONE_API_KEY = process.env.PINECONE_API_KEY;
 const PINECONE_URL = process.env.PINECONE_URL;
 
@@ -11,61 +9,51 @@ if (!PINECONE_API_KEY || !PINECONE_URL) {
   throw new Error("PINECONE_API_KEY and PINECONE_URL must be set in the environment variables.");
 }
 
-const pinecone = new Pinecone({
-  apiKey: PINECONE_API_KEY,
-});
-
+const pinecone = new Pinecone({ apiKey: PINECONE_API_KEY });
 const index = pinecone.index({ host: PINECONE_URL });
 
-export const searchPinecone = async (embdeddings: number[], question: string) => {
-    const results = await index.query({
-        vector: embdeddings,
-        topK: 10,
-        includeMetadata: true,
-    });
+export type BestResult = {
+  id: string;
+  score: number;
+  question: string;
+  answer: string;
+};
 
-    const bestMatch = results.matches[0];
-    const scoreThreshold: number = 0.85;
+const SCORE_THRESHOLD = 0.85;
 
-    if(!bestMatch?.score) {
-        throw new Error("No matches found in Pinecone.");
-    }
+export const searchPinecone = async (
+  embeddings: number[],
+  question: string
+): Promise<BestResult> => {
+  const results = await index.query({
+    vector: embeddings,
+    topK: 10,
+    includeMetadata: true,
+  });
 
-    if (bestMatch && bestMatch?.score >= scoreThreshold) {
-        return bestMatch;
-    }
+  const match = results.matches[0];
 
-    else {
-        // Fallback to gemini
-        console.log("No suitable match found. Using Gemini as fallback.");
-        const fallbackResponse = await geminiFallback(question);
-        return {
-            id: "gemini-fallback",
-            score: 1.0,
-            metadata: {
-                question: question,
-                answer: fallbackResponse
-            }
-        };
-    }
-}
+  if (match && (match.score ?? 0) >= SCORE_THRESHOLD) {
+    return {
+      id: match.id,
+      score: match.score ?? 0,
+      question: String(match.metadata?.pattern ?? ''),
+      answer: String(match.metadata?.response ?? ''),
+    };
+  }
 
+  // Fallback to Gemini, same shape
+  console.log("No suitable match found. Using Gemini as fallback.");
+  const fallbackResponse = await geminiFallback(question);
 
+  if (!fallbackResponse) {
+    throw new Error("Gemini fallback returned no response.");
+  }
 
-
-// const embedding: number[] = await generateEmbedding();
-
-// const results = await searchPinecone(embedding);
-// console.log("Search results:", results);
-
-// const scoreThreshold: number = 0.85;
-// const bestMatch: any = results[0];
-
-// if (bestMatch && bestMatch.score >= scoreThreshold) {
-//     console.log("Best match found:", bestMatch);
-// }
-
-// else {
-//     // Fallback to gemini
-//     console.log("No suitable match found. Using Gemini as fallback.");
-// }
+  return {
+    id: 'gemini-fallback',
+    score: 1.0,
+    question,
+    answer: fallbackResponse,
+  };
+};
